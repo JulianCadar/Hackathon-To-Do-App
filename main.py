@@ -1,49 +1,72 @@
 import customtkinter as ctk
 import openai
+from functools import partial
+
 WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 800
 class Task():
-    def __init__(self, title: str, completed:bool):
+    def __init__(self, title: str,taskWidget):
         self.title = title
-        self.completed = completed
-tasks:list[Task] = []
+        self.completed =False
+        self.taskWidget = taskWidget
+        self.taskCheckBox = None
+
+tasksToDo: list[Task] = []
+completedTasks: list[Task] = []
+
 def writeErrorMessage(msg):
     label = ctk.CTkLabel(master=window,text = msg,text_color="white")
     label.place(x=WINDOW_WIDTH/2, y=WINDOW_HEIGHT-50)
-def addTask():
+def addTask(tasks, taskTitle):
     #taskFrame = ctk.CTkFrame(master = frame, border_width=1, border_color="black")
     #taskFrame.grid_rowconfigure()
     #taskFrame.pack(side="top", fill="both", expand=True)
-    taskTitle = taskEntry.get(1.0,ctk.END).strip()
     if len(taskTitle)==0:
         writeErrorMessage("Too Short")
-    elif len(taskTitle)>49:
-        writeErrorMessage("Too long")
-        taskEntry.delete(1.0,ctk.END)
+    
     else:
-        taskWidget = ctk.CTkLabel(master = frame, text = taskTitle+ "    ")
-        tasks.append(Task(taskTitle,False))
+        taskLabel = ctk.CTkLabel(master = frame, text = "    "+taskTitle+ "    ",border_width=3,border_color="black",fg_color="white", text_color="black",bg_color="black")
+        currentTaskWidget = Task(taskTitle,taskLabel)
+        
         taskEntry.delete(1.0,ctk.END)
         #taskWidget.pack(side = "left")
-        taskWidget.grid(row=len(tasks) - 1, column=0, sticky="W")
+        taskLabel.grid(row=len(tasks), column=0, sticky="W")
 
-        taskCheckBox = ctk.CTkCheckBox(master = frame, text = "Completed?")
+        taskCheckBox = ctk.CTkCheckBox(master = frame, text = "Completed?", command=lambda :partial(completedCheckBoxCallBack, currentTaskWidget)())
         #taskCheckBox.pack(side="right")
-        taskCheckBox.grid(row=len(tasks) - 1, column=1, sticky="E")
+        taskCheckBox.grid(row=len(tasks), column=1, sticky="E")
+        currentTaskWidget.taskCheckBox = taskCheckBox
+        tasks.append(currentTaskWidget)
+
+
     
-    
+def completedCheckBoxCallBack(currentTaskWidget: Task):
+    if (currentTaskWidget.taskCheckBox.get()):
+        currentTaskWidget.taskWidget.destroy()
+        currentTaskWidget.taskCheckBox.destroy()
+        currentTaskWidget.completed=True
+        
+
+    return True
+
 window = ctk.CTk()
 window.title("To Do App")
 window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
-frame = ctk.CTkScrollableFrame(master = window, width = 800, height = 400)
+toDoLabel = ctk.CTkLabel(master = window, text = "To Do:", text_color="White",font = ("Arial",40))
+toDoLabel.place(x=WINDOW_WIDTH/2 -600, y=WINDOW_HEIGHT/8 -50)
+frame = ctk.CTkScrollableFrame(master = window, width = 400, height = 400)
 frame.place(x = WINDOW_WIDTH/2 -600, y = WINDOW_HEIGHT/8)
 
-taskEntry = ctk.CTkTextbox(master=window, width =700, height = 50)
+taskEntry = ctk.CTkTextbox(master=window, width =300, height = 50)
 taskEntry.place(x=WINDOW_WIDTH/2 -600, y = WINDOW_HEIGHT/8 -100)
 
-taskAddButton = ctk.CTkButton(master = window, width = 100, height = 50, fg_color="white", text_color="black", text= "Add Task", border_color="black",border_width=2, hover_color="light gray",command = addTask)
-taskAddButton.place(x= WINDOW_WIDTH/2 +125, y = WINDOW_HEIGHT/8 -100)
+taskAddButton = ctk.CTkButton(master = window, width = 100, height = 50, fg_color="white", text_color="black", text= "Add Task", border_color="black",border_width=2, hover_color="light gray",command = lambda :addTask(tasksToDo, taskEntry.get(1.0,ctk.END).strip()))
+taskAddButton.place(x= WINDOW_WIDTH/2 -275, y = WINDOW_HEIGHT/8 -100)
 
+# completedLabel = ctk.CTkLabel(master = window, text = "Completed Tasks: ", text_color="White",font = ("Arial",40))
+# completedLabel.place(x=WINDOW_WIDTH/2, y=WINDOW_HEIGHT/8 -50)
 
+# completedFrame = ctk.CTkScrollableFrame(master=window, width =400, height = 400)
+# completedFrame.place(x = WINDOW_WIDTH/2, y = WINDOW_HEIGHT/8)
 
 window.mainloop()
