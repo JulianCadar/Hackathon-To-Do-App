@@ -14,10 +14,25 @@ You may have to order them in terms of difficulty and return the reordered items
 #print(response.text)
 
 class Task: # Record that stores info about each individual task
-    def __init__(self, description, completed = False) -> None:
+    def __init__(self, description, completed = False, guide = "") -> None:
         self.title = get_title(description)
         self.description = description
         self.completed = completed
+        self.guide = get_guide(description)
+
+def get_guide(description: str): # Returns response from the chatbot that summarises the user's task into a guide
+    prompt = f"""Here is a description of a task that the user wants to do:
+    
+    \"{description}\"
+    
+    Can you generate a guide for this task, please try to keep it below 100 characters and don't use * characters.
+    number each step in the guide and make sure to include all the necessary steps to complete the task. 
+    you may also provide links to resources that may help the user complete the task, but please do not include any links to paid resources.
+    up to 7 steps are allowed, if the task is too simple to have 7 steps, then just provide the necessary steps to complete the task."""
+
+    
+    response = chat.send_message(prompt)
+    return response.text.strip()
 
 def get_title(description: str): # Returns response from the chatbot that summarises the user's task into a title
     prompt = f"""Here is a description of a task that the user wants to do:
@@ -88,16 +103,20 @@ if __name__ == "__main__":
     for i in range(len(tasks)):
         print(f"Task number {i}:\nDescription: {tasks[i].description}\nTitle: {tasks[i].title}\n")
 
-    print()
+    print("Printing tasks in alphabetical order:\n")
 
     ordered_tasks = reorder_tasks_alphabetical(tasks)
 
     for i in range(len(ordered_tasks)):
         print(f"Task number {i}:\nDescription: {ordered_tasks[i].description}\nTitle: {ordered_tasks[i].title}\n")
 
-    print()
+    print("Printing tasks in priority order:\n")
 
     ordered_tasks = reorder_tasks_priority(tasks)
 
     for i in range(len(ordered_tasks)):
         print(f"Task number {i}:\nDescription: {ordered_tasks[i].description}\nTitle: {ordered_tasks[i].title}\n")
+
+    print("Printing tasks with guides:\n")
+    for i in range(len(ordered_tasks)):
+        print(f"Task number {i}: Title: {ordered_tasks[i].title}\nGuide: \n{ordered_tasks[i].guide}\n")
