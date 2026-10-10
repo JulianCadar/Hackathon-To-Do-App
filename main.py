@@ -14,8 +14,10 @@ class Task():
         self.MainTitle = None
         self.originalText = None
 
+        self.openDescButtonWidget = None
+        self.openGuideButtonWidget = None
+
 tasksToDo: list[Task] = []
-completedTasks: list[Task] = []
 
 def writeErrorMessage(msg):
     label = ctk.CTkLabel(master=window,text = msg,text_color="white")
@@ -39,7 +41,10 @@ def addTask(tasks, taskTitle):
 
         openGuideButton = ctk.CTkButton(master= frame, text="Get Guide",fg_color="white", text_color="black", command =lambda :partial(openGuideFunction, currentTaskWidget)(),hover_color="light gray")
         openGuideButton.grid(row=len(tasks), column=3, sticky="W")
-        
+
+        currentTaskWidget.openDescButtonWidget=openDescButton
+        currentTaskWidget.openGuideButtonWidget=openGuideButton
+
         taskEntry.delete(1.0,ctk.END)
         #taskWidget.pack(side = "left")
         taskLabel.grid(row=len(tasks), column=0, sticky="W")
@@ -74,6 +79,16 @@ def openGuideFunction(task:Task):
 
     originalTextWidget.configure(state="disabled")
 
+def sortTasks():
+    ordered_tasks = AI.reorder_tasks_priority(tasksToDo)
+    for i in range(len(ordered_tasks)):
+    #    print("")
+        ordered_tasks[i].openDescButton.grid(row=i, column=2, sticky="W")
+        ordered_tasks[i].openGuideButton.grid(row=i, column=3, sticky="W")
+        ordered_tasks[i].taskLabel.grid(row=i, column=0, sticky="W")
+        ordered_tasks[i].taskCheckBox.grid(row=i, column=1, sticky="E")
+
+
 window = ctk.CTk()
 window.title("To Do App")
 window.geometry(f"{WINDOW_WIDTH}x{WINDOW_HEIGHT}")
@@ -98,7 +113,8 @@ descriptionLabel.pack(side="top")
 #descriptionFrame = ctk.CTkScrollableFrame(master=window, width =400, height = 400)
 #descriptionFrame.place(x = WINDOW_WIDTH/2, y = WINDOW_HEIGHT/8)
 
-
+#sortTaskButton = ctk.CTkButton(master=window,text = "Sort tasks by priority", width = 100, height = 50, fg_color="white", text_color="black", border_color="black",border_width=2, hover_color="light gray",command=sortTasks)
+#sortTaskButton.pack()
 
 originalTextWidget = ctk.CTkTextbox(master=descriptionFrame, state="disabled", wrap="word")
 originalTextWidget.pack(side="bottom")
