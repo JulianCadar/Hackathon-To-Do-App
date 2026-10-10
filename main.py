@@ -61,6 +61,8 @@ def completedCheckBoxCallBack(currentTaskWidget: Task):
     if (currentTaskWidget.taskCheckBox.get()):
         currentTaskWidget.taskWidget.destroy()
         currentTaskWidget.taskCheckBox.destroy()
+        currentTaskWidget.openGuideButtonWidget.destroy()
+        currentTaskWidget.openDescButtonWidget.destroy()
         currentTaskWidget.completed=True
         
 
