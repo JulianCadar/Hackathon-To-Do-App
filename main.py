@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import openai
+import AI
 from functools import partial
 
 WINDOW_WIDTH = 1600
@@ -10,6 +11,7 @@ class Task():
         self.completed =False
         self.taskWidget = taskWidget
         self.taskCheckBox = None
+        self.MainTitle = None
 
 tasksToDo: list[Task] = []
 completedTasks: list[Task] = []
@@ -25,7 +27,7 @@ def addTask(tasks, taskTitle):
         writeErrorMessage("Too Short")
     
     else:
-        taskLabel = ctk.CTkLabel(master = frame, text = "    "+taskTitle+ "    ",border_width=3,border_color="black",fg_color="white", text_color="black",bg_color="black")
+        taskLabel = ctk.CTkLabel(master = frame, text = "    "+taskTitle +"    ",border_width=3,border_color="black",fg_color="white", text_color="black",bg_color="black")
         currentTaskWidget = Task(taskTitle,taskLabel)
         
         taskEntry.delete(1.0,ctk.END)
